@@ -17,7 +17,7 @@ pip3 install youtubecrawler
 > Initialize Wrapper
 
 ```
-from youtubecrawler import crawl
+from youtubecrawler.crawl import crawl
 
 
 
