@@ -35,21 +35,33 @@ Wrapper Is Capable of
 **For Video**
 
 > Getting Video Views
+> 
 > Getting video tags
+> 
 > Getting Video Description
+> 
 > Getting Video Title
+> 
 > Getting Likes and Dislikes
+> 
 > Getting Upload Time
+> 
 > Getting Uploader Information
 
 **For channels**
 Can Scrape Any info about the channel
 __Like__
+
 > Last Date Joined
+> 
 > Latest Video Details
+> 
 > Latest Community Post
+> 
 > Channel Description
+> 
 > Info about other channels of the video
+> 
 > Subs of the channel ( by name)
 
 ## Videos
