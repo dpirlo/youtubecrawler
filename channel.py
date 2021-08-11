@@ -19,7 +19,7 @@ from collections import OrderedDict
 
 
 
-from  crawl import crawl
+from  .crawl import crawl
 class channel:
     def __init__(self,channel_id:str='',channellink:str="",channelname:str=''):
         self.session = HTMLSession()
