@@ -1,5 +1,11 @@
 ## YouTubeCrawle Wrapper for python
 
+  **Why This wrapper?**
+```
+This is wrapper is not limited to videos only it can scrape both channel and videos ;D 
+```
+__Have a look below__
+
 
 **Help**
 
