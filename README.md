@@ -2,7 +2,7 @@
 
   **Why This wrapper?**
 ```
-This is wrapper is not limited to videos only it can scrape both channel and videos ;D 
+This is wrapper is not limited to videos only it can scrape both channel and videos  seperately ;D 
 ```
 __Have a look below__
 
