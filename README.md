@@ -22,6 +22,20 @@ pip3 install youtubecrawler
 
 > Initialize Wrapper
 
+# For Asyncio:
+- If you are using asyncio or asynced function 
+```
+from youtubecrawler.synced import crawl
+
+yt=crawl(video_name="xyz)
+```
+
+# For Synced
+
+- i.e **Without any `async` function**
+
+
+
 ```
 from youtubecrawler.crawl import crawl
 
@@ -76,6 +90,7 @@ __Like__
 > Subs of the channel ( by name)
 
 ## Videos
+- Use __await ....__ if you are using asynced one
 
 **Gather everything in a single call**
 
@@ -156,10 +171,18 @@ videolink=yt.videolink()
 
 ## Channels
 
+** For Asynced function**
+```
+from youtubecrawler.synced import channel
+ch=channel(channelname="CarryMinati")
+
+```
+**For Non Synced**
+
 ```
 from youtubecrawler.channel import channel
-
 ch=channel(channelname="CarryMinati")
+
 
 ```
 
@@ -168,6 +191,9 @@ Other parameters
 > ch = channel(channellink=channellink)
 > ch = channel(channelid='/channel/UC0IWRLai-BAwci_e9MylNGw')
 ```
+
+- Use __await ....__ if you are using asynced one
+
 
 **Get Subs of the channel**
 __Use full with name__
