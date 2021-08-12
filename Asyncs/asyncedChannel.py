@@ -1,4 +1,4 @@
- 
+  
 #    Copyright 2021 KeinShin
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -10,6 +10,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from youtubecrawler.channel import channel
+from youtubecrawler.Asyncs import Init
+
 import re
 from requests.sessions import session
 from requests_html import HTMLSession
@@ -17,48 +20,55 @@ from bs4 import BeautifulSoup
 import requests
 from collections import OrderedDict
 
-
-
-from  .crawl import crawl
-class channel:
-    def __init__(self,channel_id:str='',channellink:str="",channelname:str=''):
-        self.session = HTMLSession()
-        if channel_id:
-            self.channel="https://www.youtube.com/channel/" + channel_id
-        elif channellink:
-            self.channel=channellink
-        elif channelname:
-            response = self.session.get("https://www.youtube.com/results?search_query=" + channelname)
-            response.html.render(sleep=1)
-            
-            soup = BeautifulSoup(response.html.html, "html.parser") 
+from youtubecrawler.Asyncs.asynced import Crawl
+class Channel(Init):
+    def __init__(self,**args):
+      channel_id=args.get("channel_id")
+      channellink=args.get('channel_link')
+      channelname=args.get("channelname")
+      self.channel_id=channel_id
+      self.channellink=channellink
+      self.channelname=channelname
+    async def Ainit(self): 
+      
+        if self.channel_id:
+            self.channel="https://www.youtube.com/channel/" + self.channel_id
+            self.chanid=self.channel_id
+        elif self.channellink:
+       
+            self.channel=self.channellink
+            c=Crawl(video_link=self.channel)
+            self.chanid=await c.videolink().split("/")[-1]
+        elif self.channelname:
+            soup =await  self.init("https://www.youtube.com/results?search_query=" + self.channelname)
             self.channel=soup.find("a",{"class":"channel-link yt-simple-endpoint style-scope ytd-channel-renderer"}).get("href")
-            self.id=self.channel
+            self.chanid=self.channel
+            
             self.channel="https://www.youtube.com" + self.channel
         else:
             raise ValueError("No Paramter is provided")
-        response = self.session.get(self.channel)
-        response.html.render(sleep=1)
-        self.soup = BeautifulSoup(response.html.html, "html.parser") 
+        self.chanid=self.chanid
         
-        
-    def subs(self):
+    async def subs(self):
+            await self.Ainit()
+            self.soup=await self.init(self.channel)
             return self.soup.find("yt-formatted-string",{"id":"subscriber-count"}).text
      
     
-    def about(self):
-        response = self.session.get('https://www.youtube.com' + self.id + "/" + "about")
-        response.html.render(sleep=1)
-        soup = BeautifulSoup(response.html.html, "html.parser")  
-        return soup
+    async def about(self):
+       await self.Ainit()
 
-    def description(self):
-        self.chan=self.about()
+       return await self.init('https://www.youtube.com' + self.chanid + "/" + "about")
+
+    async def description(self):
+        await self.Ainit()
+        self.chan= await self.about()
         return self.chan.find("yt-formatted-string",{"id":"description"}).text 
     
     
-    def joined(self):
-        about=self.about()
+    async def joined(self):
+        await self.Ainit()
+        about=await self.about()
         j=[]
         for i in about.find_all("span",{"class":"style-scope yt-formatted-string"}):
         
@@ -67,10 +77,11 @@ class channel:
         return j[jp +1]
     
     
-    def links(self):
+    async def links(self):
+        await self.Ainit()
         print("Getting Links of about Please wait!!!")
         print("Processing Request")
-        lip=self.about()
+        lip=await self.about()
         li={}
         laps=[]
         gaps=[]
@@ -81,10 +92,7 @@ class channel:
                 x=x.get('href')
                 if x.find("redirect") != -1:
                  
-                 session=HTMLSession()
-                 response = session.get(x)
-                 response.html.render(sleep=1)
-                 x = BeautifulSoup(response.html.html, "html.parser")  
+                 x = self.init(x)
                  x=x.find_all("div",attrs={"id":"redirect-action-container"})
                  for i in x:
                      x=i.find("a")['href']
@@ -98,31 +106,25 @@ class channel:
         
         return li
 
-    def latest_video(self):
-     print('https://www.youtube.com' + self.id + "/" + "videos")
-     response = self.session.get('https://www.youtube.com' + self.id + "/" + "videos")
-     response.html.render(sleep=1)
-     soup = BeautifulSoup(response.html.html, "html.parser")  
+    async def latest_video(self):
+     await self.Ainit()
+     soup =await self.init('https://www.youtube.com' + self.chanid + "/" + "videos")
      op=soup.find("a",{"id":"thumbnail"}).get('href')
-     op=crawl(video_link="https://www.youtube.com" + op)
-     return {"Latest Video" : op.VideoDetails()}
+     op=Crawl(video_link="https://www.youtube.com" + op)
+     return {"Latest Video" : await op.VideoDetails()}
     
-    def latest_community(self):
-     response = self.session.get('https://www.youtube.com' + self.id + "/" + "community")
-     response.html.render(sleep=1)
-     soup = BeautifulSoup(response.html.html, "html.parser")  
+    async def latest_community(self):
+     await self.Ainit()
+     soup = await self.init('https://www.youtube.com' + self.chanid + "/" + "community")
      comun=soup.find("yt-formatted-string",{"id":"content-text"}).text
      return comun
  
-    def spareChannels(self):
-      session=HTMLSession()
-      response = session.get('https://www.youtube.com' + self.id + "/" + "channels")
-      response.html.render(sleep=1)
-      soup = BeautifulSoup(response.html.html, "html.parser")
+    async def spareChannels(self):
+      await self.Ainit()
+      soup=await self.init(self.channel)
+
       channels={}
       for i in soup.find_all("div",{"id":"channel"}):
-           response = session.get('https://www.youtube.com' + i.find("a")['href'])
-           response.html.render(sleep=1)
-           soup = BeautifulSoup(response.html.html, "html.parser")
+           soup = await self.init('https://www.youtube.com' + i.find("a")['href'])
            channels.update({i.find('span').text:{"Link":'https://www.youtube.com' + i.find("a")['href'],"Subscribers":soup.find("yt-formatted-string",{"id":"subscriber-count"}).text }})
       return channels

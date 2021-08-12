@@ -1,3 +1,4 @@
+  
 #    Copyright 2021 KeinShin
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -10,22 +11,17 @@
 #    limitations under the License.
 
 from bs4 import BeautifulSoup
-import requests
-import moviepy.editor  as  mp
-from requests_html import HTMLSession 
-import os
+from requests_html import AsyncHTMLSession
+
 import urllib.request
+import time
+
 import re
-from urllib.request import urlopen,Request
-from lxml import etree
-from requests.api import head
-import base
-import pytube  
-from pytube import YouTube  
-
-
-class crawl:
-    
+from pytube import YouTube
+import asyncio
+from functools import wraps
+from youtubecrawler.Asyncs import Init
+class Crawl(Init):
     def __init__(self,video_name:str="",video_id:str="",output: str = "",video_link:str=''):
         self.name = video_name
         
@@ -45,90 +41,77 @@ class crawl:
             video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
             self.vidid=video_ids[0]
             self.link="https://www.youtube.com/watch?v=" + self.vidid
+    
         self.link2=self.link
         user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
         headers = {'User-Agent':user_agent} 
         self.link=self.link2
-    
-    
-        session = HTMLSession()
-        response = session.get(self.link2)
-        response.html.render(sleep=1)
-        self.soup = BeautifulSoup(response.html.html, "html.parser") 
-    
-    
-    
-    
-    
-    
-    def keyword(self):
-            
+    async def knit(self):
+        self.soup=await self.init(self.link)
+
+
+    async def keyword(self):
+        self.soup=await self.init(self.link)     
         self.title = self.soup.find("meta",attrs={"name":"keywords"})
         
         return self.title["content"]
-    
-       
-    def videolink(self):
+        
+    async def videolink(self):
         return self.vidid
     
-    def VideoDetails(self):
+    async def VideoDetails(self):
 
-        likes=self.likes_dislikes()[1]
-        dislikes=self.likes_dislikes()[2]
+        likes=await self.likes_dislikes()[1]
+        dislikes=await self.likes_dislikes()[2]
         if dislikes == "Dislike":
             dislikes= "N/A"
-        title=self.upload_time_and_title()[0]
-        upload=self.upload_time_and_title()[1]
+        title=await self.upload_time_and_title()[0]
+        upload=await self.upload_time_and_title()[1]
         params = {
          "Video Title": title,
-         "Video Id" : self.videolink().split("/")[-1], 
-         "Description": self.description(),
-         "Veiws": self.veiws(),
+         "Video Id" :await self.videolink().split("/")[-1], 
+         "Description": await self.description(),
+         "Veiws": await self.veiws(),
          "Likes": likes,
          "Dislikes": dislikes,
          "Upload Time": upload,
-         "Video Link":self.videolink(),
-         "Channel" : self.channel()
+         "Video Link":await self.videolink(),
+         "Channel" : await self.channel()
         }
         return params
-    
-    
-    def likes_dislikes(self):
-        session = HTMLSession()
-        response = session.get(self.link2)
-        response.html.render(sleep=1)
-        soup = BeautifulSoup(response.html.html, "html.parser")
+        
+    async def likes_dislikes(self):
+        soup=await self.init(self.link2)
         likes_dislikes=[]
         for i in soup.find_all("yt-formatted-string",{"id":"text"}):
             likes_dislikes.append(i.get_text())
         return likes_dislikes
     
-    
-    def upload_time_and_title(self):
+    async def upload_time_and_title(self):
         det=[]
+        self.soup=await self.init(self.link2)
         title=self.soup.find_all("yt-formatted-string",{"class":"style-scope ytd-video-primary-info-renderer"})
         for i in title:
             det.append(i.get_text())
         return det
-    
-    def VidTitle(self):
-        return self.upload_time_and_title()[0]
 
-    
-    def videoUploadTime(self):
-        return self.upload_time_and_title()[1]
+    async def VidTitle(self):
+        return await self.upload_time_and_title()[0]
+
+    async def videoUploadTime(self):
+        return await self.upload_time_and_title()[1]
         
 
-    
-    def description(self):
+    async def description(self):
         descrip=''
+        self.soup=await self.init(self.link2)
         for i in self.soup.find_all("span",{"class":"style-scope yt-formatted-string"}):
             descrip+=i.get_text()
         return descrip
     
-    
-    def channel(self):
+    async def channel(self):
         channelinfo={}
+        self.soup=await self.init(self.link2)
         name=self.soup.find("yt-formatted-string", {"class": "ytd-channel-name"})
         tg=name
         name=name.find("a").text
@@ -141,8 +124,7 @@ class crawl:
         })
         return channelinfo
     
-    
-    def download(self,to_mp3:bool=False,mp3name:str=''):
+    async def download(self,to_mp3:bool=False,mp3name:str=''):
         
         if not self.out:
             path='.'
@@ -153,13 +135,13 @@ class crawl:
 
         yt.download(path)
                 
-    
-    def veiws(self):
+    async def veiws(self):
+        self.soup=await self.init(self.link2)
         veiws=self.soup.find("span",{"class":"view-count style-scope ytd-video-view-count-renderer"})
         return veiws.text
     
-    
-    def videolink(self):
+    async def videolink(self):
+      self.soup=await self.init(self.link2)
       ida=self.soup.find("link",{"rel":"shortlinkUrl"})
       return ida.get("href")
 
