@@ -1,2 +1,2 @@
-from youtubecrawler.Asyncs.asynced import Crawl
-from youtubecrawler.Asyncs.asynced.channel import Channel
+from youtubecrawler.Asyncs.asynced import crawl
+from youtubecrawler.Asyncs.asyncedChannel import channel

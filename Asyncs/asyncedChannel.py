@@ -10,7 +10,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from youtubecrawler.channel import channel
 from youtubecrawler.Asyncs import Init
 
 import re
@@ -20,8 +19,8 @@ from bs4 import BeautifulSoup
 import requests
 from collections import OrderedDict
 
-from youtubecrawler.Asyncs.asynced import Crawl
-class Channel(Init):
+from youtubecrawler.Asyncs.asynced import crawl as Crawl
+class channel(Init):
     def __init__(self,**args):
       channel_id=args.get("channel_id")
       channellink=args.get('channel_link')

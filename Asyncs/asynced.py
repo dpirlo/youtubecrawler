@@ -21,7 +21,7 @@ from pytube import YouTube
 import asyncio
 from functools import wraps
 from youtubecrawler.Asyncs import Init
-class Crawl(Init):
+class crawl(Init):
     def __init__(self,video_name:str="",video_id:str="",output: str = "",video_link:str=''):
         self.name = video_name
         
