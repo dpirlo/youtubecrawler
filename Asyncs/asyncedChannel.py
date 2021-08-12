@@ -10,7 +10,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from youtubecrawler.Asyncs import Init
+from . import Init
 
 import re
 from requests.sessions import session
@@ -19,7 +19,7 @@ from bs4 import BeautifulSoup
 import requests
 from collections import OrderedDict
 
-from youtubecrawler.Asyncs.asynced import crawl as Crawl
+from .asynced import crawl as Crawl
 class channel(Init):
     def __init__(self,**args):
       channel_id=args.get("channel_id")
@@ -37,7 +37,7 @@ class channel(Init):
        
             self.channel=self.channellink
             c=Crawl(video_link=self.channel)
-            self.chanid=await c.videolink().split("/")[-1]
+            self.chanid=(await c.videolink()).split("/")[-1]
         elif self.channelname:
             soup =await  self.init("https://www.youtube.com/results?search_query=" + self.channelname)
             self.channel=soup.find("a",{"class":"channel-link yt-simple-endpoint style-scope ytd-channel-renderer"}).get("href")

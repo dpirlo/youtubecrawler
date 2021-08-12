@@ -20,7 +20,7 @@ import re
 from pytube import YouTube
 import asyncio
 from functools import wraps
-from youtubecrawler.Asyncs import Init
+from . import Init
 class crawl(Init):
     def __init__(self,video_name:str="",video_id:str="",output: str = "",video_link:str=''):
         self.name = video_name
@@ -61,15 +61,15 @@ class crawl(Init):
     
     async def VideoDetails(self):
 
-        likes=await self.likes_dislikes()[1]
-        dislikes=await self.likes_dislikes()[2]
+        likes=(await self.likes_dislikes)()[1]
+        dislikes=(await self.likes_dislikes)()[2]
         if dislikes == "Dislike":
             dislikes= "N/A"
-        title=await self.upload_time_and_title()[0]
-        upload=await self.upload_time_and_title()[1]
+        title=(await self.upload_time_and_title())[0]
+        upload=(await self.upload_time_and_title())[1]
         params = {
          "Video Title": title,
-         "Video Id" :await self.videolink().split("/")[-1], 
+         "Video Id" :(await self.videolink()).split("/")[-1], 
          "Description": await self.description(),
          "Veiws": await self.veiws(),
          "Likes": likes,
@@ -96,10 +96,10 @@ class crawl(Init):
         return det
 
     async def VidTitle(self):
-        return await self.upload_time_and_title()[0]
+        return (await self.upload_time_and_title())[0]
 
     async def videoUploadTime(self):
-        return await self.upload_time_and_title()[1]
+        return (await self.upload_time_and_title())[1]
         
 
     async def description(self):
