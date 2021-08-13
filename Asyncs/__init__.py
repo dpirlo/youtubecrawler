@@ -15,7 +15,7 @@ class Init:
         
          session = AsyncHTMLSession()
          response = await session.get(self.link2)
-         await response.html.arender(sleep=1,keep_page=True)
+         await response.html.arender(sleep=1,keep_page=True,timeout=30)
        
 
           
