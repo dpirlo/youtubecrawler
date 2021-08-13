@@ -23,6 +23,9 @@ from functools import wraps
 from . import Init
 class crawl(Init):
     def __init__(self,video_name:str="",video_id:str="",output: str = "",video_link:str=''):
+        if " " in video_name:
+            video_name=video_name.split()
+            video_name="+".join(video_name)
         self.name = video_name
         
         self.id = video_id
@@ -47,11 +50,10 @@ class crawl(Init):
         headers = {'User-Agent':user_agent} 
         self.link=self.link2
     async def knit(self):
-        self.soup=await self.init(self.link)
-
+        await self.init(self.link)
 
     async def keyword(self):
-        self.soup=await self.init(self.link)     
+        await self.init(self.link)     
         self.title = self.soup.find("meta",attrs={"name":"keywords"})
         
         return self.title["content"]
@@ -81,18 +83,19 @@ class crawl(Init):
         return params
         
     async def likes_dislikes(self):
-        soup=await self.init(self.link2)
+        await self.init(self.link)
         likes_dislikes=[]
-        for i in soup.find_all("yt-formatted-string",{"id":"text"}):
+        for i in self.soup.find_all("yt-formatted-string",{"id":"text"}):
             likes_dislikes.append(i.get_text())
         return likes_dislikes
     
     async def upload_time_and_title(self):
         det=[]
-        self.soup=await self.init(self.link2)
+        await self.init(self.link)
         title=self.soup.find_all("yt-formatted-string",{"class":"style-scope ytd-video-primary-info-renderer"})
         for i in title:
             det.append(i.get_text())
+        print(det)
         return det
 
     async def VidTitle(self):
@@ -104,14 +107,14 @@ class crawl(Init):
 
     async def description(self):
         descrip=''
-        self.soup=await self.init(self.link2)
+        await self.init(self.link)
         for i in self.soup.find_all("span",{"class":"style-scope yt-formatted-string"}):
             descrip+=i.get_text()
         return descrip
     
     async def channel(self):
         channelinfo={}
-        self.soup=await self.init(self.link2)
+        await self.init(self.link)
         name=self.soup.find("yt-formatted-string", {"class": "ytd-channel-name"})
         tg=name
         name=name.find("a").text
@@ -136,12 +139,12 @@ class crawl(Init):
         yt.download(path)
                 
     async def veiws(self):
-        self.soup=await self.init(self.link2)
+        await self.init(self.link)
         veiws=self.soup.find("span",{"class":"view-count style-scope ytd-video-view-count-renderer"})
         return veiws.text
     
     async def videolink(self):
-      self.soup=await self.init(self.link2)
+      await self.init(self.link)
       ida=self.soup.find("link",{"rel":"shortlinkUrl"})
       return ida.get("href")
 

@@ -19,7 +19,6 @@ import re
 from urllib.request import urlopen,Request
 from lxml import etree
 from requests.api import head
-import base
 import pytube  
 from pytube import YouTube  
 
@@ -27,6 +26,10 @@ from pytube import YouTube
 class crawl:
     
     def __init__(self,video_name:str="",video_id:str="",output: str = "",video_link:str=''):
+        if " " in video_name:
+            video_name=video_name.split()
+            video_name="+".join(video_name)
+            
         self.name = video_name
         
         self.id = video_id
@@ -53,10 +56,10 @@ class crawl:
     
         session = HTMLSession()
         response = session.get(self.link2)
-        response.html.render(sleep=1)
+        response.html.render(sleep=1,keep_page=True,timeout=30)
         self.soup = BeautifulSoup(response.html.html, "html.parser") 
-    
-    
+        
+        response.session.close()
     
     
     
@@ -96,8 +99,9 @@ class crawl:
     def likes_dislikes(self):
         session = HTMLSession()
         response = session.get(self.link2)
-        response.html.render(sleep=1)
+        response.html.render(sleep=1,keep_page=True,timeout=30)
         soup = BeautifulSoup(response.html.html, "html.parser")
+        response.session.close()
         likes_dislikes=[]
         for i in soup.find_all("yt-formatted-string",{"id":"text"}):
             likes_dislikes.append(i.get_text())

@@ -25,6 +25,9 @@ class channel(Init):
       channel_id=args.get("channel_id")
       channellink=args.get('channel_link')
       channelname=args.get("channelname")
+      if " " in channelname:
+           channelname=channelname.split()
+           channelname="+".join(channelname)
       self.channel_id=channel_id
       self.channellink=channellink
       self.channelname=channelname
