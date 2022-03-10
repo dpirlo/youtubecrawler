@@ -37,8 +37,8 @@ class crawl:
         self.link = video_link
         if not self.name:
             if not self.id:
-              if not self.link:
-                raise ValueError("Provide Video Name Or Video Link or video id, Please.")
+                if not self.link:
+                    raise ValueError("Provide Video Name Or Video Link or video id, Please.")
         if self.link:
             self.link=self.link
         elif self.id:
@@ -48,34 +48,26 @@ class crawl:
             video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
             self.vidid=video_ids[0]
             self.link="https://www.youtube.com/watch?v=" + self.vidid
-        self.link2=self.link
-        user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
-        headers = {'User-Agent':user_agent} 
-        self.link=self.link2
-    
-    
-        session = HTMLSession()
-        response = session.get(self.link2)
-        response.html.render(sleep=1,keep_page=True,timeout=30)
-        self.soup = BeautifulSoup(response.html.html, "html.parser") 
+        # self.link2=self.link
+        # user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
+        # headers = {'User-Agent':user_agent} 
+        # self.link=self.link2
+        # session = HTMLSession()
+        # response = session.get(self.link)
+        # response.html.render(sleep=1,keep_page=True,timeout=30)
+        # self.soup = BeautifulSoup(response.html.html, "html.parser") 
         
-        response.session.close()
-    
-    
-    
+        # response.session.close()
     
     def keyword(self):
-            
         self.title = self.soup.find("meta",attrs={"name":"keywords"})
-        
         return self.title["content"]
     
-       
+    
     def videolink(self):
         return self.vidid
     
     def VideoDetails(self):
-
         likes=self.likes_dislikes()[1]
         dislikes=self.likes_dislikes()[2]
         if dislikes == "Dislike":
@@ -94,7 +86,6 @@ class crawl:
          "Channel" : self.channel()
         }
         return params
-    
     
     def likes_dislikes(self):
         session = HTMLSession()
@@ -118,18 +109,17 @@ class crawl:
     def VidTitle(self):
         return self.upload_time_and_title()[0]
 
-    
+    def likes(self):
+        return self.likes_dislikes()[1]
+
     def videoUploadTime(self):
         return self.upload_time_and_title()[1]
-        
-
     
     def description(self):
         descrip=''
         for i in self.soup.find_all("span",{"class":"style-scope yt-formatted-string"}):
             descrip+=i.get_text()
         return descrip
-    
     
     def channel(self):
         channelinfo={}
@@ -145,7 +135,6 @@ class crawl:
         })
         return channelinfo
     
-    
     def download(self,to_mp3:bool=False,mp3name:str=''):
         
         if not self.out:
@@ -154,16 +143,20 @@ class crawl:
             path=self.out
         yt = YouTube(self.link2)
         yt = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
-
         yt.download(path)
                 
     
     def veiws(self):
         veiws=self.soup.find("span",{"class":"view-count style-scope ytd-video-view-count-renderer"})
+        print (self)
         return veiws.text
-    
+
+    def videoname(self):
+        #veiws=self.soup.find("span",{"class":"view-count style-scope ytd-video-view-count-renderer"})
+        #print (self)
+        return self
     
     def videolink(self):
-      ida=self.soup.find("link",{"rel":"shortlinkUrl"})
-      return ida.get("href")
+        ida=self.soup.find("link",{"rel":"shortlinkUrl"})
+        return ida.get("href")
 

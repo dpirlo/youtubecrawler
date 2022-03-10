@@ -1,4 +1,3 @@
- 
 #    Copyright 2021 KeinShin
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -84,15 +83,15 @@ class channel:
             for x in lip.find_all("a",{"class":"yt-simple-endpoint style-scope ytd-channel-about-metadata-renderer"}):
                 x=x.get('href')
                 if x.find("redirect") != -1:
-                 
-                 session=HTMLSession()
-                 response = session.get(x)
-                 response.html.render(sleep=1,keep_page=True,timeout=30)
-                 x = BeautifulSoup(response.html.html, "html.parser")  
-                 response.session.close()
-                 x=x.find_all("div",attrs={"id":"redirect-action-container"})
-                 for i in x:
-                     x=i.find("a")['href']
+                    
+                    session=HTMLSession()
+                    response = session.get(x)
+                    response.html.render(sleep=1,keep_page=True,timeout=30)
+                    x = BeautifulSoup(response.html.html, "html.parser")  
+                    response.session.close()
+                    x=x.find_all("div",attrs={"id":"redirect-action-container"})
+                    for i in x:
+                        x=i.find("a")['href']
                 laps.append(x)
                     
                 gaps.append(p.text)
@@ -104,35 +103,35 @@ class channel:
         return li
 
     def latest_video(self):
-     print('https://www.youtube.com' + self.id + "/" + "videos")
-     response = self.session.get('https://www.youtube.com' + self.id + "/" + "videos")
-     response.html.render(sleep=1,keep_page=True,timeout=30)
-     soup = BeautifulSoup(response.html.html, "html.parser")  
-     op=soup.find("a",{"id":"thumbnail"}).get('href')
-     response.session.close()
-     op=crawl(video_link="https://www.youtube.com" + op)
-     return {"Latest Video" : op.VideoDetails()}
+        print('https://www.youtube.com' + self.id + "/" + "videos")
+        response = self.session.get('https://www.youtube.com' + self.id + "/" + "videos")
+        response.html.render(sleep=1,keep_page=True,timeout=30)
+        soup = BeautifulSoup(response.html.html, "html.parser")  
+        op=soup.find("a",{"id":"thumbnail"}).get('href')
+        response.session.close()
+        op=crawl(video_link="https://www.youtube.com" + op)
+        return {"Latest Video" : op.VideoDetails()}
     
     def latest_community(self):
-     response = self.session.get('https://www.youtube.com' + self.id + "/" + "community")
-     response.html.render(sleep=1,keep_page=True,timeout=30)
-     soup = BeautifulSoup(response.html.html, "html.parser")  
-     comun=soup.find("yt-formatted-string",{"id":"content-text"}).text
-     response.session.close()
-     return comun
- 
+        response = self.session.get('https://www.youtube.com' + self.id + "/" + "community")
+        response.html.render(sleep=1,keep_page=True,timeout=30)
+        soup = BeautifulSoup(response.html.html, "html.parser")  
+        comun=soup.find("yt-formatted-string",{"id":"content-text"}).text
+        response.session.close()
+        return comun
+
     def spareChannels(self):
-      session=HTMLSession()
-      response = session.get('https://www.youtube.com' + self.id + "/" + "channels")
-      response.html.render(sleep=1,keep_page=True,timeout=30)
-    
-      soup = BeautifulSoup(response.html.html, "html.parser")
-      response.session.close()
-      channels={}
-      for i in soup.find_all("div",{"id":"channel"}):
-           response = session.get('https://www.youtube.com' + i.find("a")['href'])
-           response.html.render(sleep=1,keep_page=True,timeout=30)
-           soup = BeautifulSoup(response.html.html, "html.parser")
-           channels.update({i.find('span').text:{"Link":'https://www.youtube.com' + i.find("a")['href'],"Subscribers":soup.find("yt-formatted-string",{"id":"subscriber-count"}).text }})
-      response.session.close()
-      return channels
+        session=HTMLSession()
+        response = session.get('https://www.youtube.com' + self.id + "/" + "channels")
+        response.html.render(sleep=1,keep_page=True,timeout=30)
+        
+        soup = BeautifulSoup(response.html.html, "html.parser")
+        response.session.close()
+        channels={}
+        for i in soup.find_all("div",{"id":"channel"}):
+            response = session.get('https://www.youtube.com' + i.find("a")['href'])
+            response.html.render(sleep=1,keep_page=True,timeout=30)
+            soup = BeautifulSoup(response.html.html, "html.parser")
+            channels.update({i.find('span').text:{"Link":'https://www.youtube.com' + i.find("a")['href'],"Subscribers":soup.find("yt-formatted-string",{"id":"subscriber-count"}).text }})
+        response.session.close()
+        return channels
