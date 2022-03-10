@@ -8,7 +8,6 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-
 from bs4 import BeautifulSoup
 import requests
 import moviepy.editor  as  mp
@@ -21,6 +20,7 @@ from lxml import etree
 from requests.api import head
 import pytube  
 from pytube import YouTube  
+import random
 
 
 class crawl:
@@ -52,12 +52,12 @@ class crawl:
         # user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
         # headers = {'User-Agent':user_agent} 
         # self.link=self.link2
-        # session = HTMLSession()
-        # response = session.get(self.link)
-        # response.html.render(sleep=1,keep_page=True,timeout=30)
-        # self.soup = BeautifulSoup(response.html.html, "html.parser") 
-        
-        # response.session.close()
+    
+    
+        session = HTMLSession()
+        response = session.get(self.link)
+        response.html.render(sleep=4)
+        self.soup = BeautifulSoup(response.html.html, "html.parser") 
     
     def keyword(self):
         self.title = self.soup.find("meta",attrs={"name":"keywords"})
@@ -75,15 +75,16 @@ class crawl:
         title=self.upload_time_and_title()[0]
         upload=self.upload_time_and_title()[1]
         params = {
-         "Video Title": title,
-         "Video Id" : self.videolink().split("/")[-1], 
-         "Description": self.description(),
-         "Veiws": self.veiws(),
-         "Likes": likes,
-         "Dislikes": dislikes,
-         "Upload Time": upload,
-         "Video Link":self.videolink(),
-         "Channel" : self.channel()
+            "Video Title": title,
+            "Video Id" : self.videolink().split("/")[-1], 
+            "Description": self.description(),
+            "Veiws": self.veiws(),
+            "Likes": likes,
+            "Dislikes": dislikes,
+            "Upload Time": upload,
+            "Video Link":self.videolink(),
+            "Channel" : self.channel(),
+            "Refs": self.videoRef()
         }
         return params
     
@@ -148,7 +149,7 @@ class crawl:
     
     def veiws(self):
         veiws=self.soup.find("span",{"class":"view-count style-scope ytd-video-view-count-renderer"})
-        print (self)
+        #print (self)
         return veiws.text
 
     def videoname(self):
@@ -159,4 +160,10 @@ class crawl:
     def videolink(self):
         ida=self.soup.find("link",{"rel":"shortlinkUrl"})
         return ida.get("href")
+
+    def videoRef(self):
+        html = urllib.request.urlopen("https://www.youtube.com/")
+        video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
+        randomref=[random.randint(1, 10) for _ in range(1)]
+        return video_ids[randomref[0]]
 
