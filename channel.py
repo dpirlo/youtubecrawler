@@ -15,15 +15,21 @@ from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 import requests
 from collections import OrderedDict
+import sys
+import urllib.request
 
+from urllib.request import urlopen,Request
 
+sys.path.append(".")
+from  crawl import crawl
+from scroller import scroller
 
-from  .crawl import crawl
 class channel:
     def __init__(self,channel_id:str='',channellink:str="",channelname:str=''):
         self.session = HTMLSession()
         if channel_id:
-            self.channel="https://www.youtube.com/channel/" + channel_id
+            self.channel= channel_id
+            #print(self.channel)
         elif channellink:
             self.channel=channellink
         elif channelname:
@@ -35,7 +41,7 @@ class channel:
             
             soup = BeautifulSoup(response.html.html, "html.parser") 
             self.channel=soup.find("a",{"class":"channel-link yt-simple-endpoint style-scope ytd-channel-renderer"}).get("href")
-            self.id=self.channel
+            #self.id=self.channel
             self.channel="https://www.youtube.com" + self.channel
         else:
             raise ValueError("No Paramter is provided")
@@ -43,13 +49,12 @@ class channel:
         response.html.render(sleep=1,keep_page=True,timeout=30)
         self.soup = BeautifulSoup(response.html.html, "html.parser") 
         
-        response.session.close()
+       # response.session.close()
     def subs(self):
             return self.soup.find("yt-formatted-string",{"id":"subscriber-count"}).text
-     
     
     def about(self):
-        response = self.session.get('https://www.youtube.com' + self.id + "/" + "about")
+        response = self.session.get('https://www.youtube.com/' + self.channel + "/" + "about")
         response.html.render(sleep=1,keep_page=True,timeout=30)
         soup = BeautifulSoup(response.html.html, "html.parser")  
         response.session.close()
@@ -103,14 +108,18 @@ class channel:
         return li
 
     def latest_video(self):
-        print('https://www.youtube.com' + self.id + "/" + "videos")
-        response = self.session.get('https://www.youtube.com' + self.id + "/" + "videos")
-        response.html.render(sleep=1,keep_page=True,timeout=30)
-        soup = BeautifulSoup(response.html.html, "html.parser")  
-        op=soup.find("a",{"id":"thumbnail"}).get('href')
-        response.session.close()
-        op=crawl(video_link="https://www.youtube.com" + op)
-        return {"Latest Video" : op.VideoDetails()}
+        print(self.channel + "/" + "videos")
+        html = urllib.request.urlopen(self.channel)
+        html = scroller.getfullhtml(self.channel + "/" + "videos")
+        video_ids = re.findall(r"watch\?v=(\S{11})", html)
+        #print(video_ids[randomref[0]])
+        aux =set(video_ids)
+        video_ids_ = list(aux)
+        print(video_ids_)
+        for i in video_ids_:
+                op=crawl(video_link="https://www.youtube.com/watch?v=" + i)
+                print("views of "+ op.VidTitle()+": " + op.veiws())
+        return 
     
     def latest_community(self):
         response = self.session.get('https://www.youtube.com' + self.id + "/" + "community")

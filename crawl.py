@@ -22,7 +22,6 @@ import pytube
 from pytube import YouTube  
 import random
 
-
 class crawl:
     
     def __init__(self,video_name:str="",video_id:str="",output: str = "",video_link:str=''):
@@ -48,11 +47,6 @@ class crawl:
             video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
             self.vidid=video_ids[0]
             self.link="https://www.youtube.com/watch?v=" + self.vidid
-        # self.link2=self.link
-        # user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
-        # headers = {'User-Agent':user_agent} 
-        # self.link=self.link2
-    
     
         session = HTMLSession()
         response = session.get(self.link)
@@ -62,7 +56,6 @@ class crawl:
     def keyword(self):
         self.title = self.soup.find("meta",attrs={"name":"keywords"})
         return self.title["content"]
-    
     
     def videolink(self):
         return self.vidid
@@ -90,7 +83,7 @@ class crawl:
     
     def likes_dislikes(self):
         session = HTMLSession()
-        response = session.get(self.link2)
+        response = session.get(self.link)
         response.html.render(sleep=1,keep_page=True,timeout=30)
         soup = BeautifulSoup(response.html.html, "html.parser")
         response.session.close()
@@ -98,7 +91,6 @@ class crawl:
         for i in soup.find_all("yt-formatted-string",{"id":"text"}):
             likes_dislikes.append(i.get_text())
         return likes_dislikes
-    
     
     def upload_time_and_title(self):
         det=[]
@@ -142,11 +134,10 @@ class crawl:
             path='.'
         else:
             path=self.out
-        yt = YouTube(self.link2)
+        yt = YouTube(self.link)
         yt = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
         yt.download(path)
                 
-    
     def veiws(self):
         veiws=self.soup.find("span",{"class":"view-count style-scope ytd-video-view-count-renderer"})
         #print (self)
@@ -166,4 +157,3 @@ class crawl:
         video_ids = re.findall(r"watch\?v=(\S{11})", html.read().decode())
         randomref=[random.randint(1, 10) for _ in range(1)]
         return video_ids[randomref[0]]
-
